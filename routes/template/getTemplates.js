@@ -48,10 +48,10 @@ router.get('/', async function (req, res) {
       const reqObj = {
         user_id: req.query.user_id,
       }
-      await ovadaApi
-        .get('/get_all_facilities_by_user_id')
-        .set('Authorization', req.headers.authorization)
-        .send(reqObj)
+      // await ovadaApi
+      //   .get('/get_all_facilities_by_user_id')
+      //   .set('Authorization', req.headers.authorization)
+      //   .send(reqObj)
       if (req.query.pagination) {
         if (!req.query.page) {
           req.query.page = 1
