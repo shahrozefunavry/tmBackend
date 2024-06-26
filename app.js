@@ -38,7 +38,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/addTemplate', tokenAuthentication, addTemplate)
+app.use('/addTemplate', addTemplate)
 app.use('/getTemplates', tokenAuthentication, getTemplates)
 app.use('/getTemplateById', tokenAuthentication, getTemplateById)
 app.use('/getTemplateName', tokenAuthentication, getTemplateName)
@@ -64,7 +64,9 @@ app.use(
 )
 app.use('/addUserInstance', tokenAuthentication, addUserInstance)
 app.use('/getUserInstance', tokenAuthentication, getUserInstance)
-
+app.use('/', (req, res) => {
+	return res.send('Hello from Tm server');
+});
 // app.use('/addTemplate', addTemplate);
 // app.use('/uploadImage',  uploadImage);
 // app.use('/addTags',  addTags);

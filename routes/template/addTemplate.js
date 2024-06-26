@@ -6,10 +6,10 @@ const clone = require('clone')
 const supertest = require('supertest')
 const lodash = require('lodash')
 const api = supertest('http://localhost:' + process.env.PORT)
-const pool = require('../../db.js')
-
-router.post('/', function (req, res) {
-  pool.getConnection(function (err, con) {
+const connection = require('../../db')
+router.post('/', async function (req, res) {
+  console.log("🚀 ~ req:", req.body.template_name)
+  connection.getConnection(function (err, con) {
     con.beginTransaction(async function (err) {
       if (err) {
         con.rollback(function () {
@@ -161,11 +161,13 @@ router.post('/', function (req, res) {
           const carryForwardCurrent = {}
 
           if (req.body.sections.length > 0) {
+            
             let query = 'Insert into section(id, title, template_id, properties, parent_section_id, type, linked_component, created_by, updated_at) values('
             for (let i = 0; i < req.body.sections.length; i++) {
               let tempTitle = JSON.parse(
                 JSON.stringify(req.body.sections[i].section_title)
               )
+              console.log("🚀 ~ tempTitle:", tempTitle)
               tempTitle = tempTitle.replace(/\\/g, '\\\\')
               tempTitle = tempTitle.replace(/"/g, '\\"')
               tempTitle = tempTitle.replace(/'/g, '\\\'')
@@ -576,8 +578,9 @@ router.post('/', function (req, res) {
 
           if (
             req.body.carryNewDeleted &&
-                        req.body.carryNewDeleted.length &&
-                        req.body.carryNewDeleted[0] !== {}
+                        req.body.carryNewDeleted.length 
+                        // &&
+                        // req.body.carryNewDeleted[0] !== {}
           ) {
             const carryNewDeletedArray = []
             const carryNewDeletedLinked = []
