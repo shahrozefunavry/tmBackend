@@ -39,31 +39,31 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/addTemplate', addTemplate)
-app.use('/getTemplates', tokenAuthentication, getTemplates)
-app.use('/getTemplateById', tokenAuthentication, getTemplateById)
-app.use('/getTemplateName', tokenAuthentication, getTemplateName)
-app.use('/deleteUserInstance', tokenAuthentication, deleteUserInstance)
-app.use('/deleteTemplate', tokenAuthentication, deleteTemplate)
+app.use('/getTemplates',  getTemplates)
+app.use('/getTemplateById',  getTemplateById)
+app.use('/getTemplateName',  getTemplateName)
+app.use('/deleteUserInstance',  deleteUserInstance)
+app.use('/deleteTemplate',  deleteTemplate)
 
-app.use('/uploadImage', tokenAuthentication, uploadImage)
+app.use('/uploadImage',  uploadImage)
 app.use(
   '/updateTemplatePermissions',
-  tokenAuthentication,
+  
   updateTemplatePermissions
 )
 app.use('/addTags', addTags)
-app.use('/getSectionTypes', tokenAuthentication, getSectionTypes)
-app.use('/search', tokenAuthentication, search)
-app.use('/getSectionsByTemplate', tokenAuthentication, getSectionsByTemplate)
-app.use('/getTagSuggestions', tokenAuthentication, getTagSuggestions)
-app.use('/autoCompleteTags', tokenAuthentication, autoCompleteTags)
+app.use('/getSectionTypes', getSectionTypes)
+app.use('/search',  search)
+app.use('/getSectionsByTemplate',  getSectionsByTemplate)
+app.use('/getTagSuggestions',  getTagSuggestions)
+app.use('/autoCompleteTags',  autoCompleteTags)
 app.use(
   '/getUIComponentsBySection',
-  tokenAuthentication,
+  
   getUIComponentsBySection
 )
-app.use('/addUserInstance', tokenAuthentication, addUserInstance)
-app.use('/getUserInstance', tokenAuthentication, getUserInstance)
+app.use('/addUserInstance',  addUserInstance)
+app.use('/getUserInstance',  getUserInstance)
 app.use('/', (req, res) => {
 	return res.send('Hello from Tm server');
 });
