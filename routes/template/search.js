@@ -185,7 +185,7 @@ router.post('/', async function (req, res) {
   req.body.searchParams
 }' and o.identifier = 's') union
                          all select s.id, s.title, s.template_id, s.properties, s.parent_section_id, s.type, s.linked_component
-                          from section s inner join cte on s.parent_section_id = cte.id) select DISTINCT cte.id as section_id,
+                          from section s inner join cte on s.parent_section_id = cte.id) select DISTINCT cte.id as section_id,t.updated_at, 
                           cte.title as section_title, cte.template_id as section_template, cte.properties as options,
                           cte.parent_section_id as parentId, cte.type as section_type, cte.linked_component, d.doctor_id, f.facility_id,
                           t.created_by, t.name as boundTemplateStatement from cte inner join template t on t.id = cte.template_id
