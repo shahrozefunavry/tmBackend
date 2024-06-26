@@ -57,7 +57,8 @@ router.post('/', async function (req, res) {
           case_type_id: req.body.case_id,
         }
 
-        const getUserTemplate = await ovadaApi.get('/get_user_template').set('Authorization', req.headers.authorization).send(reqObj)
+        //const getUserTemplate = await ovadaApi.get('/get_user_template').set('Authorization', req.headers.authorization).send(reqObj)
+        const getUserTemplate ={body:{result:{data:[]}}};
         if (!(getUserTemplate.body && getUserTemplate.body.result && !functions.isNil(getUserTemplate.body.result.data))) {
           res.status(200).send({ data: [], message: 'No Template Stored' })
           return

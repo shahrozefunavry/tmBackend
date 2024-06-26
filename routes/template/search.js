@@ -27,10 +27,12 @@ router.post('/', async function (req, res) {
       const reqObj = {
         user_id: req.body.user_id,
       }
-      const facilitiesResult = await ovadaApi
-        .get('/get_all_facilities_by_user_id')
-        .set('Authorization', req.headers.authorization)
-        .send(reqObj)
+      // const facilitiesResult = await ovadaApi
+      //   .get('/get_all_facilities_by_user_id')
+      //   .set('Authorization', req.headers.authorization)
+      //   .send(reqObj)
+
+        const facilitiesResult ={body:{result:{data:[{facility_locations:[]}]}}};
       let facilityList = '-1,'
       if (facilitiesResult.body.result) {
         for (
