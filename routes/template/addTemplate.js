@@ -18,6 +18,10 @@ router.post('/', async function (req, res) {
         })
         res.status(406).send({message: err.message})
       }
+      console.log("🚀 ~ req.body.user_name:", req.body.user_name)
+      req.body["user_name"]= "shahroze"
+      req.body["user_id"] = 1
+
       try {
         const validated = await templateValidate(req.body)
         if (!validated.error) {
@@ -103,6 +107,7 @@ router.post('/', async function (req, res) {
           templateProperties = templateProperties.replace(/\\/g, '\\\\')
           templateProperties = templateProperties.replace(/"/g, '\\"')
           templateProperties = templateProperties.replace(/'/g, '\\"')
+          console.log("🚀 ~ req.body.user_id:", req.body.user_id)
 
           const previousNames = await functions.runTransactionQuery(
             `Select name from template where created_by = ${req.body.user_id} && deleted_at is null`,
