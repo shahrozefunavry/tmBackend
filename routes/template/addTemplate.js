@@ -47,16 +47,7 @@ router.post('/', async function (req, res) {
             `Select * from template_user_permissions where template_id = ${req.body.template_id}`,
             con
           )
-          if (req.body.shared && updateCheck) {
-            previousDoctorPermissions = await functions.runTransactionQuery(
-              `Select * from doctor_templates where template_id = ${req.body.template_id}`,
-              con
-            )
-            previousFacilityPermissions = await functions.runTransactionQuery(
-              `Select * from facility_templates where template_id = ${req.body.template_id}`,
-              con
-            )
-          }
+         
           await functions.runTransactionQuery(
             `Delete from template where id = ${req.body.template_id}`,
             con
@@ -125,26 +116,7 @@ router.post('/', async function (req, res) {
           console.log(query)
           let queryResults = await functions.runTransactionQuery(query, con)
           req.body.template_id = queryResults.insertId
-          query =
-                        'Insert into doctor_templates(id, doctor_id, template_id) values('
-          for (let i = 0; i < previousDoctorPermissions.length; i++) {
-            query += `${previousDoctorPermissions[i].id}, ${previousDoctorPermissions[i].doctor_id}, ${previousDoctorPermissions[i].template_id}),(`
-          }
-          if (previousDoctorPermissions.length) {
-            query = query.slice(0, -2)
-            await functions.runTransactionQuery(query, con)
-          }
-
-          query =
-                        'Insert into facility_templates(id, facility_id, template_id) values('
-          for (let i = 0; i < previousFacilityPermissions.length; i++) {
-            query += `${previousFacilityPermissions[i].id}, ${previousFacilityPermissions[i].facility_id}, ${previousFacilityPermissions[i].template_id}),(`
-          }
-          if (previousFacilityPermissions.length) {
-            query = query.slice(0, -2)
-            await functions.runTransactionQuery(query, con)
-          }
-
+         
           let permissionsQuery = 'Insert into template_user_permissions(id, user_id, template_id, location_id, speciality_id, visit_type_id, case_type, is_default) values('
           for (let i = 0; i < previousTemplatePermissions.length; i++) {
             permissionsQuery += `${previousTemplatePermissions[i].id}, ${previousTemplatePermissions[i].user_id}, ${previousTemplatePermissions[i].template_id}, ${previousTemplatePermissions[i].location_id}, ${previousTemplatePermissions[i].speciality_id}, ${previousTemplatePermissions[i].visit_type_id}, ${previousTemplatePermissions[i].case_type}, ${previousTemplatePermissions[i].is_default}),(`

@@ -46,25 +46,42 @@ router.post('/', async function (req, res) {
 
       if (req.body.type === 'All' || req.body.type === 'template') {
         const query = `
-          Select distinct t2.id as template_id, t2.name as boundTemplateStatement, t2.public, shared, t2.default_columns, t2.properties, t2.created_by,t2.updated_at,t2.user_name from template t2
-          left join object_tags o1 on t2.id = o1.object_id left join tags tg1 on o1.tag_id = tg1.id
-          where  (t2.name like "%${req.body.searchParams}%" || (tg1.title = "${
-  req.body.searchParams
-}" && o1.identifier = "t")) &&(t2.created_by = ${
-  req.body.user_id
-} || t2.public = 1 ||
-            t2.id in (Select distinct t3.id from template t3
-              inner join doctor_templates d1 on t3.id = d1.template_id where d1.doctor_id = ${
-  req.body.user_id
-} union
-              Select distinct t4.id from template t4
-              inner join facility_templates f1 on t4.id = f1.template_id where f1.facility_id in (${facilityList})
-            )) &&t2.deleted_at is null && (t2.created_by in (${req.body.users_array.join(
-    ','
-  )}) || ${
-  req.body.users_array[0]
-} = -1) order by t2.updated_at DESC LIMIT 10 offset ${req.body.offset}`
-
+    SELECT DISTINCT
+      t2.id AS template_id,
+      t2.name AS boundTemplateStatement,
+      t2.public,
+      shared,
+      t2.default_columns,
+      t2.properties,
+      t2.created_by,
+      t2.updated_at,
+      t2.user_name
+    FROM
+      template t2
+    LEFT JOIN object_tags o1 ON t2.id = o1.object_id
+    LEFT JOIN tags tg1 ON o1.tag_id = tg1.id
+    WHERE
+      (t2.name LIKE "%${req.body.searchParams}%" OR (tg1.title = "${req.body.searchParams}" AND o1.identifier = "t"))
+      AND (t2.created_by = ${req.body.user_id} OR t2.public = 1 OR t2.id IN (
+        SELECT DISTINCT
+          t3.id
+        FROM
+          template t3
+        WHERE
+          t3.deleted_at IS NULL
+          AND (t3.created_by IN (${req.body.users_array.join(',')}) OR ${req.body.users_array[0]} = -1)
+        UNION
+        SELECT DISTINCT
+          t4.id
+        FROM
+          template t4
+        WHERE
+          t4.deleted_at IS NULL
+          AND (t4.created_by IN (${req.body.users_array.join(',')}) OR ${req.body.users_array[0]} = -1)
+      ))
+    ORDER BY t2.updated_at DESC
+    LIMIT 10 OFFSET ${req.body.offset};
+  `;
         const templatesObject = await functions.runQuery(query)
         const tempTemplatesObject = []
         for (let i = 0; i < templatesObject.length; i++) {
@@ -176,32 +193,42 @@ router.post('/', async function (req, res) {
         }
       }
       if (req.body.type === 'All' || req.body.type === 'section') {
-        const query = `with recursive cte (id, title, template_id, properties, parent_section_id, type, linked_component)
-                as ( select id, title, template_id, properties, parent_section_id, type, linked_component from section where
-                    section.title like '%${
-  req.body.searchParams
-}%' or id in (Select o.object_id as id from object_tags o inner
-                         join tags t on o.tag_id = t.id where t.title = '${
-  req.body.searchParams
-}' and o.identifier = 's') union
-                         all select s.id, s.title, s.template_id, s.properties, s.parent_section_id, s.type, s.linked_component
-                          from section s inner join cte on s.parent_section_id = cte.id) select DISTINCT cte.id as section_id,t.updated_at, 
-                          cte.title as section_title, cte.template_id as section_template, cte.properties as options,
-                          cte.parent_section_id as parentId, cte.type as section_type, cte.linked_component, d.doctor_id, f.facility_id,
-                          t.created_by, t.name as boundTemplateStatement from cte inner join template t on t.id = cte.template_id
-                          left join doctor_templates d on t.id = d.template_id left join facility_templates f on t.id =
-                          f.template_id where (f.facility_id in (${facilityList}) || d.doctor_id = ${
-  req.body.user_id
-} ||
-                          t.created_by =${
-  req.body.user_id
-}) && t.deleted_at is null  && (t.created_by in (${req.body.users_array.join(
-  ','
-)})
-                          || ${
-  req.body.users_array[0]
-} = -1) order by t.updated_at DESC  LIMIT 10
-                          offset ${req.body.offset}`
+        const query = `
+        WITH RECURSIVE cte (id, title, template_id, properties, parent_section_id, type, linked_component) AS (
+          SELECT id, title, template_id, properties, parent_section_id, type, linked_component
+          FROM section
+          WHERE section.title LIKE '%${req.body.searchParams}%'
+             OR section.id IN (
+               SELECT o.object_id AS id
+               FROM object_tags o
+               INNER JOIN tags t ON o.tag_id = t.id
+               WHERE t.title = '${req.body.searchParams}' AND o.identifier = 's'
+             )
+          UNION ALL
+          SELECT s.id, s.title, s.template_id, s.properties, s.parent_section_id, s.type, s.linked_component
+          FROM section s
+          INNER JOIN cte ON s.parent_section_id = cte.id
+        )
+        SELECT DISTINCT
+          cte.id AS section_id,
+          t.updated_at,
+          cte.title AS section_title,
+          cte.template_id AS section_template,
+          cte.properties AS options,
+          cte.parent_section_id AS parentId,
+          cte.type AS section_type,
+          cte.linked_component,
+          t.created_by,
+          t.name AS boundTemplateStatement
+        FROM cte
+        INNER JOIN template t ON t.id = cte.template_id
+        WHERE t.created_by = ${req.body.user_id}
+          AND t.deleted_at IS NULL
+          AND (t.created_by IN (${req.body.users_array.join(',')}) OR ${req.body.users_array[0]} = -1)
+        ORDER BY t.updated_at DESC
+        LIMIT 10 OFFSET ${req.body.offset};
+      `;
+      
 
         let sectionsObject = await functions.runQuery(query)
         sectionsObject = lodash.uniqBy(sectionsObject, 'section_id')

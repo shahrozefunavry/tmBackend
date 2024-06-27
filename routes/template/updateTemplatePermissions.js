@@ -14,10 +14,6 @@ router.post('/', async function (req, res) {
     const validated = await schema.validate(req.body)
     if (!validated.error) {
       const oldPermissions = await functions.runQuery(`Select shared from template where id = ${req.body.template_id}`)
-      if (oldPermissions[0].shared && !req.body.shared) {
-        await functions.runQuery(`Delete from doctor_templates where template_id = ${req.body.template_id}`)
-        await functions.runQuery(`Delete from facility_templates where template_id = ${req.body.template_id}`)
-      }
       const query = `Update template set public = ${req.body.public}, shared = ${req.body.shared} where id = ${req.body.template_id}`
       await functions.runQuery(query)
       res.status(200).send({message: 'Successfully Added Template Permissions'})
