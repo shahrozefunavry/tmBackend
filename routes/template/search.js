@@ -24,6 +24,8 @@ router.post('/', async function (req, res) {
         templates: [],
         sections: [],
       }
+      req.body["user_id"] = 1
+
       const reqObj = {
         user_id: req.body.user_id,
       }
